@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__ . '/../config/session.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../config/level1_helpers.php';
 require_pupil_login();
 
 $activePupilNav = 'home';
@@ -8,13 +10,18 @@ $pageTitle = 'BULIG | My Reading Journey';
 
 $firstName = trim((string) explode(' ', (string) $_SESSION['full_name'])[0]) ?: 'Reader';
 
-// Placeholder progress values — wire these up to a real `pupil_progress` table
-// once the Level 1 quest data is stored. Shown honestly as zero-state for now.
-$xp          = 0;
+// Real progress, pulled from `pupil_progress` (Level 1 quest data).
+try {
+    $pdo     = get_db_connection();
+    $summary = bulig_level1_summary($pdo, (int) $_SESSION['pupil_id']);
+} catch (Throwable $e) {
+    $summary = ['xp' => 0, 'completed' => [], 'streakDays' => 0];
+}
+$xp          = $summary['xp'];
 $xpTarget    = 100;
 $xpPercent   = min(100, (int) round(($xp / $xpTarget) * 100));
-$badgesCount = 0;
-$streakDays  = 0;
+$badgesCount = count($summary['completed']); // one badge per completed Level 1 quest
+$streakDays  = $summary['streakDays'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -54,7 +61,7 @@ $streakDays  = 0;
                     <div class="stat-value"><?= $xp ?> XP</div>
                     <div class="stat-label">Experience</div>
                     <div class="xp-bar-track"><div class="xp-bar-fill" data-width="<?= $xpPercent ?>"></div></div>
-                    <div class="stat-note"><?= $xp === 0 ? 'Finish an activity to earn your first XP!' : ($xpTarget - $xp) . ' XP to next level' ?></div>
+                    <div class="stat-note"><?= $xp === 0 ? 'Finish an activity to earn your first XP!' : ($xp >= $xpTarget ? "You're on a roll!" : ($xpTarget - $xp) . ' XP to next level') ?></div>
                 </div>
                 <div class="stat-card">
                     <span class="stat-icon">🏅</span>

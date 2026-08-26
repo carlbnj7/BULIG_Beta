@@ -2,8 +2,6 @@
 declare(strict_types=1);
 session_start();
 
-// http://localhost/BULIG1/index.php //
-
 // If someone is already logged in, send them straight to their dashboard.
 if (!empty($_SESSION['user_type'])) {
     header('Location: ' . ($_SESSION['user_type'] === 'teacher' ? 'teacher/dashboard.php' : 'pupil/dashboard.php'));
