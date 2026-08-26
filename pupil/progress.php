@@ -1,13 +1,21 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__ . '/../config/session.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../config/level1_helpers.php';
 require_pupil_login();
 $activePupilNav = 'progress';
 $pageTitle = 'BULIG | My Progress';
 
-$xp = 0; $xpTarget = 100;
+try {
+    $pdo     = get_db_connection();
+    $summary = bulig_level1_summary($pdo, (int) $_SESSION['pupil_id']);
+} catch (Throwable $e) {
+    $summary = ['xp' => 0, 'completed' => [], 'lessonsTotal' => 12];
+}
+$xp = $summary['xp']; $xpTarget = 100;
 $xpPercent = min(100, (int) round(($xp / $xpTarget) * 100));
-$lessonsDone = 0; $lessonsTotal = 12;
+$lessonsDone = count($summary['completed']); $lessonsTotal = $summary['lessonsTotal'];
 $lessonPercent = min(100, (int) round(($lessonsDone / $lessonsTotal) * 100));
 ?>
 <!DOCTYPE html>
@@ -28,8 +36,8 @@ $lessonPercent = min(100, (int) round(($lessonsDone / $lessonsTotal) * 100));
             <div class="stat-grid" style="grid-template-columns: repeat(2, 1fr);">
                 <div class="stat-card">
                     <span class="stat-icon">⭐</span>
-                    <div class="stat-value"><?= $xp ?> / <?= $xpTarget ?> XP</div>
-                    <div class="stat-label">Current Level Progress</div>
+                    <div class="stat-value"><?= $xp ?> XP</div>
+                    <div class="stat-label">Total Level 1 Experience</div>
                     <div class="xp-bar-track"><div class="xp-bar-fill" data-width="<?= $xpPercent ?>"></div></div>
                 </div>
                 <div class="stat-card">
