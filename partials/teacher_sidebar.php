@@ -31,7 +31,10 @@ $navItems = [
     </nav>
     <div class="sidebar-foot">
         <div class="sidebar-user">
-            <div class="avatar a-teacher"><?= htmlspecialchars($initial, ENT_QUOTES) ?></div>
+            <?php
+            require_once __DIR__ . '/../config/avatar_helpers.php';
+            echo bulig_avatar_html($_SESSION['avatar_file'] ?? null, 'a-teacher', $initial, '../');
+            ?>
             <div class="sidebar-user-meta">
                 <div class="user-name"><?= htmlspecialchars($_SESSION['full_name'] ?: $_SESSION['teacher_id'], ENT_QUOTES) ?></div>
                 <div class="user-role">Teacher</div>

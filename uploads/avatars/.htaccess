@@ -1,0 +1,6 @@
+# Defense in depth: this folder should only ever contain images we
+# generated ourselves (see upload handlers), but if anything ever slips
+# through, never let the server execute it as a script.
+php_flag engine off
+AddHandler cgi-script .php .php3 .php4 .php5 .php7 .phtml .pl .py .cgi .asp .aspx
+Options -ExecCGI -Indexes

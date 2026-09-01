@@ -1,0 +1,55 @@
+-- BULIG — Level 3 (Word Recognition) progress
+--
+-- No new table and no ALTER TABLE are required for Level 3 either.
+--
+-- sql/level1_progress.sql already created a level-agnostic table:
+--
+--   pupil_progress (id, pupil_id, level_id, lesson_id, xp_earned,
+--                    answer_text, completed_at)
+--
+-- Level 3 simply writes rows with level_id = 4:
+--
+--   lesson_id 1-25  -> the 25 Level 3 lessons, in the module's own order:
+--                      1-5   CVC short vowels (a, e, i, o, u)
+--                      6-10  Long-vowel word families (ea/ai, oa/oo,
+--                            ack/eck, all/ell, -nk/-sk)
+--                      11-20 Consonant blends (br-/bl-, cr-/cl-, dr-,
+--                            fr-/fl-, gl-/gr-, pl-/pr-, st-/str-,
+--                            sh-/sl-, sp-/spr-/spl-, tr-)
+--                      21-25 Fry's Basic Sight Words, lists 1-5
+--   lesson_id 0     -> Level 3 pre-assessment (combines the module's own
+--                      Level 3A + Level 3B Pre-Assessment Toolkits)
+--   lesson_id 100   -> Level 3 post-assessment (combines the module's own
+--                      Level 3A + Level 3B Post-Assessment Toolkits)
+--
+-- The existing UNIQUE KEY uniq_pupil_level_lesson (pupil_id, level_id,
+-- lesson_id) already scopes correctly per level, so Level 1, Level 2A,
+-- Level 2B, and Level 3 rows for the same pupil can never collide.
+--
+-- If you are setting up a fresh database, just run sql/schema.sql followed
+-- by sql/level1_progress.sql as before — nothing else to import for
+-- Level 3. This file exists purely as documentation, matching the
+-- "one file per level" layout of level1_progress.sql / level2_progress.sql.
+--
+-- ---------------------------------------------------------------------
+-- BUGFIX / MIGRATION NOTE (read this if you already have pupil data):
+-- Level 3 used to write level_id = 3, which is also what Level 2B uses
+-- (config/level2b_helpers.php). Any pupil who did both levels had their
+-- rows collide under the same (pupil_id, level_id, lesson_id) key, so
+-- whichever level they saved LAST silently overwrote the other level's
+-- XP/completion for that lesson number. Level 3 now writes level_id = 4
+-- instead. If this system already has real pupil progress saved under
+-- level_id = 3:
+--   1. lesson_id values 7-25 are unambiguous — they can only be Level 3
+--      (Level 2B only ever has lesson_id 1-6), so it's safe to move them:
+--        UPDATE pupil_progress SET level_id = 4
+--        WHERE level_id = 3 AND lesson_id BETWEEN 7 AND 25;
+--   2. lesson_id 0, 100, and 1-6 are ambiguous (both levels use that
+--      range) — for each pupil, check whether they also have a row with
+--      lesson_id BETWEEN 7 AND 25 at level_id 3 (before running the query
+--      above) to tell which level those rows really belong to, then move
+--      them by hand with the pupil_id filtered in.
+--   3. If this is a fresh/demo/development database with no real pupil
+--      data you need to keep, it's simplest to just
+--        DELETE FROM pupil_progress WHERE level_id = 3;
+--      and let pupils redo Level 2B and/or Level 3 from a clean slate.

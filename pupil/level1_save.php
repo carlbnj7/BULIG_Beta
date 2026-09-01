@@ -12,7 +12,9 @@ header('Content-Type: application/json');
 require_once __DIR__ . '/../config/session.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../config/level1_helpers.php';
-
+require_once __DIR__ . '/../config/level2_helpers.php';
+require_once __DIR__ . '/../config/level2b_helpers.php';
+require_once __DIR__ . '/../config/level3_helpers.php';
 require_pupil_login();
 
 $pdo     = get_db_connection();

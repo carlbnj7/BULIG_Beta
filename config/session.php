@@ -33,3 +33,12 @@ function require_teacher_login(): void
         exit;
     }
 }
+
+/** Redirects to the admin login page unless an admin is logged in. */
+function require_admin_login(): void
+{
+    if (empty($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
+        header('Location: ../admin_login.php');
+        exit;
+    }
+}
