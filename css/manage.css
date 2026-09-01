@@ -1,0 +1,457 @@
+/* =========================================================================
+   BULIG — Management additions (teacher tools + admin area)
+
+   Purely additive: every rule here is a NEW class name. Nothing in
+   style.css is overridden or modified — this file only adds capability
+   for teacher pupil-management, monitoring, and the admin area, reusing
+   the existing --bulig-* tokens so it still looks like the same app.
+   ========================================================================= */
+
+
+/* ---------- small text bits reused on auth-style pages ---------- */
+
+.reg-title {
+    text-align: center;
+    font-family: var(--font-display);
+    font-size: 20px;
+    color: var(--ink);
+    margin: 4px 0 14px;
+}
+
+.auth-subtext {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink-soft);
+    margin: 16px 0 0;
+}
+
+.auth-subtext a {
+    color: var(--bulig-blue);
+    text-decoration: none;
+    font-weight: 800;
+}
+
+.auth-subtext a:hover {
+    text-decoration: underline;
+}
+
+
+/* Small link under the teacher login form on index.php */
+
+.panel-subtext {
+    text-align: center;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--ink-soft);
+    margin: 12px 0 0;
+}
+
+.panel-subtext a {
+    color: var(--bulig-blue);
+    text-decoration: none;
+    font-weight: 800;
+}
+
+.panel-subtext a:hover {
+    text-decoration: underline;
+}
+
+
+/* ---------- visible Admin entry point (login page) ---------- */
+
+.admin-corner-btn {
+    position: fixed;
+    top: 18px;
+    right: 18px;
+    z-index: 20;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    background: #D6A900;
+    color: #fff;
+
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 13px;
+
+    padding: 9px 16px;
+    border-radius: 999px;
+
+    text-decoration: none;
+
+    box-shadow: 0 8px 18px -8px rgba(130, 90, 0, 0.35);
+
+    transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.admin-corner-btn:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.08);
+}
+
+.admin-corner-btn:focus-visible {
+    outline: 2px solid var(--bulig-blue);
+    outline-offset: 3px;
+}
+
+@media (max-width: 480px) {
+    .admin-corner-btn {
+        top: auto;
+        bottom: 16px;
+        right: 16px;
+        font-size: 12px;
+        padding: 8px 14px;
+    }
+}
+
+
+/* ---------- extra chip variants (base .chip is in style.css) ---------- */
+
+.chip-progress {
+    background: #FFF3D6;
+    color: #8A6100;
+}
+
+.chip-done {
+    background: #DFF5E4;
+    color: #145C34;
+}
+
+.chip-champion {
+    background: #FFE9B8;
+    color: #7A4E00;
+}
+
+.chip-level {
+    background: var(--paper-deep);
+    color: var(--bulig-green-dark);
+}
+
+
+/* ---------- mini inline forms inside table cells ---------- */
+
+.inline-form {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.mini-select {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 12.5px;
+    color: var(--ink);
+
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    padding: 5px 8px;
+    background: #fff;
+}
+
+.btn-mini {
+    font-family: var(--font-body);
+    font-weight: 800;
+    font-size: 12px;
+
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+
+    background: var(--bulig-green);
+    color: #fff;
+}
+
+.btn-mini:hover {
+    filter: brightness(1.06);
+}
+
+.btn-mini-danger {
+    background: var(--bulig-red);
+}
+
+.btn-mini-ghost {
+    background: var(--paper-deep);
+    color: var(--ink-soft);
+}
+
+
+/* ---------- roster mini progress bar (teacher monitoring) ---------- */
+
+.mini-bar-track {
+    background: var(--paper-deep);
+    border-radius: 999px;
+    height: 8px;
+    width: 90px;
+    overflow: hidden;
+}
+
+.mini-bar-fill {
+    background: linear-gradient(
+        90deg,
+        var(--bulig-gold),
+        var(--bulig-green)
+    );
+    height: 100%;
+}
+
+
+/* ---------- disclosure ("+ Add a Pupil") panel ---------- */
+
+.disclosure {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    margin-bottom: 22px;
+    overflow: hidden;
+}
+
+.disclosure > summary {
+    list-style: none;
+    cursor: pointer;
+
+    padding: 16px 20px;
+
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--ink);
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.disclosure > summary::-webkit-details-marker {
+    display: none;
+}
+
+.disclosure > summary::before {
+    content: "▸";
+    color: var(--bulig-green);
+    transition: transform 0.15s ease;
+}
+
+.disclosure[open] > summary::before {
+    transform: rotate(90deg);
+}
+
+.disclosure-body {
+    padding: 4px 20px 20px;
+    border-top: 1px solid var(--line);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 14px 16px;
+    margin-top: 14px;
+}
+
+.form-grid .field {
+    margin: 0;
+}
+
+.form-actions {
+    margin-top: 16px;
+}
+
+
+/* ---------- per-pupil answer detail row (teacher progress page) ---------- */
+
+.ans-panel {
+    background: var(--paper-deep);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin: 4px 0 4px;
+}
+
+.ans-item {
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--line);
+}
+
+.ans-item:last-child {
+    border-bottom: none;
+}
+
+.ans-q {
+    font-size: 11.5px;
+    font-weight: 800;
+    color: var(--bulig-green-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.ans-a {
+    font-size: 14px;
+    color: var(--ink);
+    margin-top: 2px;
+    font-weight: 600;
+}
+
+.ans-empty {
+    font-size: 13px;
+    color: var(--ink-soft);
+    font-style: italic;
+}
+
+.details-row td {
+    background: #FBFAF4;
+}
+
+.details-row summary {
+    cursor: pointer;
+    font-weight: 800;
+    font-size: 13px;
+    color: var(--bulig-green-dark);
+    padding: 4px 0;
+}
+
+
+/* ---------- flash / success banner (query-string driven, no JS) ---------- */
+
+.form-success {
+    background: #DFF5E4;
+    border: 1px solid #B7E4C4;
+    color: #145C34;
+
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+
+    font-weight: 700;
+    font-size: 13.5px;
+
+    margin-bottom: 18px;
+}
+
+
+/* =========================================================================
+   Admin theme — LIGHT YELLOW / WARM GOLD
+   ========================================================================= */
+
+
+/* ---------- admin dashboard background ---------- */
+
+body.bg-admin {
+    background: linear-gradient(
+        155deg,
+        #FFFBEA 0%,
+        #FFF5CC 55%,
+        #FFE9A8 100%
+    );
+}
+
+
+/* ---------- subtle background grid ---------- */
+
+body.bg-admin::before {
+    content: "";
+
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+
+    background-image:
+        linear-gradient(
+            rgba(180, 145, 40, 0.07) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(180, 145, 40, 0.07) 1px,
+            transparent 1px
+        );
+
+    background-size: 46px 46px;
+
+    mask-image: radial-gradient(
+        ellipse 80% 60% at 50% 0%,
+        black 40%,
+        transparent 90%
+    );
+}
+
+
+/* ---------- admin headings ---------- */
+
+body.bg-admin .dash-main .section-title,
+body.bg-admin .stat-card .stat-label {
+    color: var(--ink);
+}
+
+
+/* ---------- admin sidebar active link ---------- */
+
+.sidebar-admin .side-link.is-active {
+    background: linear-gradient(
+        135deg,
+        #F4D35E,
+        #D4A900
+    );
+
+    color: #fff;
+}
+
+
+/* ---------- admin avatar ---------- */
+
+.avatar.a-admin {
+    background: linear-gradient(
+        135deg,
+        #F4D35E,
+        #D4A900
+    );
+}
+
+
+/* ---------- admin welcome hero ---------- */
+
+.home-hero.hero-admin {
+    background: linear-gradient(
+        120deg,
+        #F8DC72 0%,
+        #D4A900 100%
+    );
+}
+
+
+/* ---------- admin primary action card ---------- */
+
+.is-primary.acc-admin {
+    background: linear-gradient(
+        135deg,
+        #F4D35E,
+        #D4A900
+    );
+}
+
+
+/* ---------- responsive form ---------- */
+
+@media (max-width: 640px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ---------- Learning Materials (teacher curriculum reference) ---------- */
+
+.materials-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 18px; }
+.material-card { background: #fff; border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 20px; }
+.material-card-wide { grid-column: 1 / -1; }
+.material-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.material-head span { font-size: 24px; }
+.material-head h3 { margin: 0; font-family: var(--font-display); font-size: 15px; color: var(--ink); }
+.material-card p { margin: 0 0 8px; font-size: 13.5px; color: var(--ink-soft); font-weight: 600; line-height: 1.5; }
+.material-list { margin: 8px 0 0; padding-left: 18px; font-size: 12.5px; color: var(--ink-soft); font-weight: 700; line-height: 1.8; }
+.material-grade-table { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.material-grade-row { display: flex; align-items: center; gap: 14px; padding: 10px 14px; background: var(--paper-deep); border-radius: 12px; font-size: 13px; font-weight: 700; flex-wrap: wrap; }
+
+@media (max-width: 780px) {
+    .materials-grid { grid-template-columns: 1fr; }
+}

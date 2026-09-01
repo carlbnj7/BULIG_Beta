@@ -1,0 +1,44 @@
+-- BULIG — Level 4 (Reading Fluency, Grades 1-6) progress
+--
+-- No new table and no ALTER TABLE are required for Level 4 progress.
+-- It reuses the same level-agnostic pupil_progress table as every other
+-- level (see sql/level1_progress.sql), at level_id = 5:
+--
+--   1 = Level 1, 2 = Level 2A, 3 = Level 2B, 4 = Level 3, 5 = Level 4.
+--
+--   lesson_id 1-N   -> the grade's intervention (practice) passages,
+--                      where N = BULIG_L4_INTERVENTION_COUNTS[grade] in
+--                      config/level4_helpers.php (10/10/10/9/8/9 for
+--                      Grades 1-6 respectively — see that file for why
+--                      Grades 4-6 aren't all 10). Marked complete by the
+--                      PUPIL (self-paced reading practice), same as any
+--                      other level's lessons.
+--   lesson_id 0     -> Pre-test passage fluency score, entered by the
+--                      TEACHER (miscue tally + reading time), not typed
+--                      by the pupil — this module is scored by a teacher
+--                      listening to the pupil read aloud, same as the
+--                      module's own paper "Marking and Scoring Guide".
+--                      answer_text stores the JSON from
+--                      bulig_l4_compute_score() in config/level4_helpers.php
+--                      (miscue breakdown, Oral Reading Score %, reading
+--                      level, words-per-minute).
+--   lesson_id 100   -> Post-test passage fluency score, same shape as
+--                      lesson_id 0. The post-test passage is the exact
+--                      same text as the pre-test (reread to measure
+--                      improvement) — that's the module's own design,
+--                      not a bug.
+--
+-- Which grade's content a pupil sees is controlled entirely by the
+-- existing pupils.grade_level column (already added by sql/schema.sql —
+-- see teacher/assign_grade.php for how a teacher changes it). Nothing new
+-- to add there either.
+--
+-- The existing UNIQUE KEY uniq_pupil_level_lesson (pupil_id, level_id,
+-- lesson_id) already scopes level_id = 5 away from every other level, so
+-- this can't collide with Level 1/2A/2B/3 the way Level 3 used to
+-- collide with Level 2B before that was fixed (see the migration note in
+-- sql/level3_progress.sql).
+--
+-- If you are setting up a fresh database, just run sql/schema.sql,
+-- sql/level1_progress.sql, and sql/teacher_admin.sql as before — nothing
+-- else to import for Level 4. This file exists purely as documentation.

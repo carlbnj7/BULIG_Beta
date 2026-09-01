@@ -26,7 +26,7 @@ try {
     $pdo = get_db_connection();
 
     $stmt = $pdo->prepare(
-        'SELECT id, teacher_id, password_hash, first_name, last_name
+        'SELECT id, teacher_id, password_hash, first_name, last_name, avatar_file
          FROM teachers
          WHERE teacher_id = :teacher_id
          LIMIT 1'
@@ -44,6 +44,7 @@ try {
     $_SESSION['teacher_pk'] = $teacher['id'];
     $_SESSION['teacher_id'] = $teacher['teacher_id'];
     $_SESSION['full_name']  = trim($teacher['first_name'] . ' ' . $teacher['last_name']);
+    $_SESSION['avatar_file']= $teacher['avatar_file'];
 
     header('Location: teacher/dashboard.php');
     exit;

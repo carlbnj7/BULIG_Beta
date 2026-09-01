@@ -1,0 +1,33 @@
+-- BULIG — Level 2B (Phonological Awareness, Book 2) progress
+--
+-- No new table and no ALTER TABLE are required for Level 2B, exactly like
+-- Level 2A before it.
+--
+-- sql/level1_progress.sql already created a level-agnostic table:
+--
+--   pupil_progress (id, pupil_id, level_id, lesson_id, xp_earned,
+--                    answer_text, completed_at)
+--
+-- `level_id` is a generic INT, so Level 2B simply writes rows with
+-- level_id = 3 instead of level_id = 1 (Level 1) or level_id = 2
+-- (Level 2A). Levels 1 and 2A are completely untouched by this — their
+-- rows live at level_id 1 and 2 respectively and Level 2B never reads or
+-- writes those rows (it only ever queries/inserts level_id = 3).
+--
+--   lesson_id 1-6   -> the 6 Level 2B units (Blending Onsets/Rimes,
+--                      Segmenting Onsets/Rimes, Segmenting Syllables,
+--                      Blending Syllables, Sentence Segmentation,
+--                      Rhymes and Rhyming Songs) — each unit bundles all
+--                      of that category's real module Activities
+--                      (Activities 1-22 total) as sequential stages.
+--   lesson_id 0     -> Level 2B pre-assessment
+--   lesson_id 100   -> Level 2B post-assessment
+--
+-- The existing UNIQUE KEY uniq_pupil_level_lesson (pupil_id, level_id,
+-- lesson_id) already scopes correctly per level, so Level 1, Level 2A,
+-- and Level 2B rows for the same pupil can never collide.
+--
+-- If you are setting up a fresh database, just run sql/schema.sql followed
+-- by sql/level1_progress.sql as before — nothing else to import for
+-- Level 2B. This file exists purely as documentation, to keep the same
+-- "one file per level" layout as level1_progress.sql / level2_progress.sql.

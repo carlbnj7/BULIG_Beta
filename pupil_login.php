@@ -33,7 +33,7 @@ try {
     $pdo = get_db_connection();
 
     $stmt = $pdo->prepare(
-        'SELECT id, student_id, password_hash, first_name, last_name, grade_level, section
+        'SELECT id, student_id, password_hash, first_name, last_name, grade_level, section, avatar_file
          FROM pupils
          WHERE student_id = :student_id
          LIMIT 1'
@@ -56,6 +56,7 @@ try {
     $_SESSION['full_name']  = trim($pupil['first_name'] . ' ' . $pupil['last_name']);
     $_SESSION['grade_level']= $pupil['grade_level'];
     $_SESSION['section']    = $pupil['section'];
+    $_SESSION['avatar_file']= $pupil['avatar_file'];
 
     header('Location: pupil/dashboard.php');
     exit;

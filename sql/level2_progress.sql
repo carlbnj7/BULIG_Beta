@@ -1,0 +1,29 @@
+-- BULIG — Level 2A (Phonological Awareness) progress
+--
+-- No new table and no ALTER TABLE are required for Level 2A.
+--
+-- sql/level1_progress.sql already created a level-agnostic table:
+--
+--   pupil_progress (id, pupil_id, level_id, lesson_id, xp_earned,
+--                    answer_text, completed_at)
+--
+-- `level_id` was already a generic INT (not hard-coded to 1), so Level 2A
+-- simply writes rows with level_id = 2 instead of level_id = 1:
+--
+--   lesson_id 1-8   -> the 8 Level 2A quests (Isolation, Identification,
+--                      Categorization, Blending, Segmentation, Deletion,
+--                      Addition, Substitution)
+--   lesson_id 0     -> Level 2A pre-assessment
+--   lesson_id 100   -> Level 2A post-assessment
+--
+-- The existing UNIQUE KEY uniq_pupil_level_lesson (pupil_id, level_id,
+-- lesson_id) already scopes correctly per level, so Level 1 and Level 2A
+-- rows for the same pupil can never collide, and the same composite key
+-- also serves as an efficient index for "give me this pupil's Level 2A
+-- rows" lookups (WHERE pupil_id = ? AND level_id = 2 ...).
+--
+-- If you are setting up a fresh database, just run sql/schema.sql followed
+-- by sql/level1_progress.sql as before — nothing else to import for
+-- Level 2A. This file exists purely as documentation so the reasoning is
+-- easy to find later, and to keep the same "one file per level" layout as
+-- level1_progress.sql.
