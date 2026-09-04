@@ -7,6 +7,7 @@ require_once __DIR__ . '/../config/level2_helpers.php';
 require_once __DIR__ . '/../config/level2b_helpers.php';
 require_once __DIR__ . '/../config/level3_helpers.php';
 require_once __DIR__ . '/../config/level4_helpers.php';
+require_once __DIR__ . '/../config/level5_helpers.php';
 require_pupil_login();
 $activePupilNav = 'lessons';
 $pageTitle = 'BULIG | My Lessons';
@@ -24,6 +25,7 @@ try {
     $summary3       = bulig_level3_summary($pdo, $pupilId);
     $level3Complete = bulig_level3_is_complete($pdo, $pupilId);
     $pupilGrade     = bulig_pupil_grade($pdo, $pupilId);
+    $level4Complete = bulig_level4_is_complete($pdo, $pupilId, $pupilGrade);
     $assignedLevel  = bulig_pupil_current_level($pdo, $pupilId);
 } catch (Throwable $e) {
     $summary        = ['xp' => 0, 'completed' => [], 'streakDays' => 0];
@@ -34,6 +36,7 @@ try {
     $level2bComplete = false;
     $summary3       = ['xp' => 0, 'completed' => [], 'lessonsTotal' => BULIG_L3_LESSON_COUNT];
     $level3Complete = false;
+    $level4Complete = false;
     $pupilGrade     = null;
     $assignedLevel  = 1;
 }
@@ -41,6 +44,7 @@ $level2Unlocked  = bulig_level_unlocked(2, $level1Complete, $assignedLevel);
 $level2bUnlocked = bulig_level_unlocked(3, $level2Complete, $assignedLevel);
 $level3Unlocked  = bulig_level_unlocked(4, $level2bComplete, $assignedLevel);
 $level4Unlocked  = bulig_level_unlocked(5, $level3Complete, $assignedLevel);
+$level5Unlocked  = bulig_level_unlocked(6, $level4Complete, $assignedLevel);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -129,6 +133,28 @@ $level4Unlocked  = bulig_level_unlocked(5, $level3Complete, $assignedLevel);
                     <span class="action-icon">🔒</span>
                     <h3>Level 4: Fluency</h3>
                     <p>Unlocks after finishing Level 3.</p>
+                    <span class="pill-soon">Locked</span>
+                </div>
+                <?php endif; ?>
+                <?php if ($level5Unlocked && $pupilGrade): ?>
+                <a href="level5.php" class="action-card acc-pupil">
+                    <span class="action-icon">👂</span>
+                    <h3>Level 5: Listening &amp; Vocabulary (Grade <?= $pupilGrade ?>)</h3>
+                    <p>20 activities picked just for your grade — listening comprehension and vocabulary building.</p>
+                    <span class="action-go">Enter Level 5 →</span>
+                </a>
+                <?php elseif ($level5Unlocked): ?>
+                <div class="action-card is-soon">
+                    <span class="action-icon">🏫</span>
+                    <h3>Level 5: Listening &amp; Vocabulary</h3>
+                    <p>Ask your teacher to set your grade level to unlock this.</p>
+                    <span class="pill-soon">Needs Grade</span>
+                </div>
+                <?php else: ?>
+                <div class="action-card is-soon">
+                    <span class="action-icon">🔒</span>
+                    <h3>Level 5: Listening &amp; Vocabulary</h3>
+                    <p>Unlocks after finishing Level 4.</p>
                     <span class="pill-soon">Locked</span>
                 </div>
                 <?php endif; ?>

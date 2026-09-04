@@ -1,0 +1,29 @@
+-- BULIG — Level 5 (Listening Comprehension & Vocabulary Development,
+-- Grades 1-6) progress
+--
+-- No new table and no ALTER TABLE are required. Level 5 reuses the same
+-- level-agnostic pupil_progress table as every other level, at
+-- level_id = 6:
+--
+--   1 = Level 1, 2 = Level 2A, 3 = Level 2B, 4 = Level 3, 5 = Level 4,
+--   6 = Level 5.
+--
+--   lesson_id 1-20 -> one of that grade's 20 real intervention
+--                     activities (see config/level5_content.php for the
+--                     verified title list and which ones currently have
+--                     playable content). Marked complete by the PUPIL
+--                     (self-scored quiz), same as Levels 1-3.
+--
+-- Which grade's activities a pupil sees is controlled entirely by the
+-- existing pupils.grade_level column (same one Level 4 already uses) —
+-- nothing new to add there either.
+--
+-- The existing UNIQUE KEY uniq_pupil_level_lesson (pupil_id, level_id,
+-- lesson_id) already scopes level_id = 6 away from every other level, so
+-- this can't collide with Level 4 (level_id 5) or anything earlier — see
+-- the migration note in sql/level3_progress.sql for why that scoping
+-- matters (Level 3 used to collide with Level 2B before it was fixed).
+--
+-- If you are setting up a fresh database, just run sql/schema.sql,
+-- sql/level1_progress.sql, and sql/teacher_admin.sql as before — nothing
+-- else to import for Level 5. This file exists purely as documentation.

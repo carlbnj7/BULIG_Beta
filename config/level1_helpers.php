@@ -21,7 +21,7 @@ const BULIG_L1_XP_PER_ASSESSMENT = 40;
  * that referenced it (teacher/pupils.php, add_pupil.php, assign_level.php)
  * — see BULIG_FIXES.md for the full list of fixed bugs.
  */
-const BULIG_MAX_LEVEL = 5;
+const BULIG_MAX_LEVEL = 6;
 
 /**
  * Display label for a `pupils.current_level` value — this is the number
@@ -35,6 +35,7 @@ const BULIG_LEVEL_LABELS = [
     3 => 'Level 2B',
     4 => 'Level 3',
     5 => 'Level 4',
+    6 => 'Level 5',
 ];
 function bulig_level_label(int $level): string
 {
@@ -89,7 +90,7 @@ function bulig_pupil_recent_activity(PDO $pdo, int $pupilId, int $limit = 5): ar
     $stmt->execute(['pid' => $pupilId]);
     $rows = $stmt->fetchAll();
 
-    $icons = [1 => '🚀', 2 => '🔤', 3 => '🔡', 4 => '📖', 5 => '🎙️'];
+    $icons = [1 => '🚀', 2 => '🔤', 3 => '🔡', 4 => '📖', 5 => '🎙️', 6 => '👂'];
     $out = [];
     foreach ($rows as $r) {
         $levelId = (int) $r['level_id'];
@@ -140,7 +141,7 @@ function bulig_teacher_recent_activity(PDO $pdo, int $teacherPk, int $limit = 8)
     $stmt->execute(['tid' => $teacherPk]);
     $rows = $stmt->fetchAll();
 
-    $icons = [1 => '🚀', 2 => '🔤', 3 => '🔡', 4 => '📖', 5 => '🎙️'];
+    $icons = [1 => '🚀', 2 => '🔤', 3 => '🔡', 4 => '📖', 5 => '🎙️', 6 => '👂'];
     $out = [];
     foreach ($rows as $r) {
         $levelId = (int) $r['level_id'];

@@ -7,6 +7,7 @@ require_once __DIR__ . '/../config/level2_helpers.php';
 require_once __DIR__ . '/../config/level2b_helpers.php';
 require_once __DIR__ . '/../config/level3_helpers.php';
 require_once __DIR__ . '/../config/level4_helpers.php';
+require_once __DIR__ . '/../config/level5_helpers.php';
 require_pupil_login();
 $activePupilNav = 'progress';
 $pageTitle = 'BULIG | My Progress';
@@ -25,6 +26,8 @@ try {
     $pupilGrade     = bulig_pupil_grade($pdo, $pupilId);
     $assignedLevel  = bulig_pupil_current_level($pdo, $pupilId);
     $summary4       = $pupilGrade ? bulig_level4_summary($pdo, $pupilId, $pupilGrade) : ['xp' => 0, 'completed' => [], 'lessonsTotal' => 0, 'preDone' => false, 'postDone' => false, 'preScore' => null, 'postScore' => null];
+    $level4Complete = bulig_level4_is_complete($pdo, $pupilId, $pupilGrade);
+    $summary5       = $pupilGrade ? bulig_level5_summary($pdo, $pupilId, $pupilGrade) : ['xp' => 0, 'completed' => [], 'lessonsTotal' => 0];
 } catch (Throwable $e) {
     $summary        = ['xp' => 0, 'completed' => [], 'lessonsTotal' => 12];
     $level1Complete = false;
@@ -37,11 +40,14 @@ try {
     $pupilGrade     = null;
     $assignedLevel  = 1;
     $summary4       = ['xp' => 0, 'completed' => [], 'lessonsTotal' => 0, 'preDone' => false, 'postDone' => false, 'preScore' => null, 'postScore' => null];
+    $level4Complete = false;
+    $summary5       = ['xp' => 0, 'completed' => [], 'lessonsTotal' => 0];
 }
 $level2Unlocked  = bulig_level_unlocked(2, $level1Complete, $assignedLevel);
 $level2bUnlocked = bulig_level_unlocked(3, $level2aComplete, $assignedLevel);
 $level3Unlocked  = bulig_level_unlocked(4, $level2bComplete, $assignedLevel);
 $level4Unlocked  = bulig_level_unlocked(5, $level3Complete, $assignedLevel);
+$level5Unlocked  = bulig_level_unlocked(6, $level4Complete, $assignedLevel);
 $xp = $summary['xp']; $xpTarget = 100;
 $xpPercent = min(100, (int) round(($xp / $xpTarget) * 100));
 $lessonsDone = count($summary['completed']); $lessonsTotal = $summary['lessonsTotal'];
@@ -66,6 +72,11 @@ $xp4 = $summary4['xp']; $xp4Target = 100;
 $xp4Percent = min(100, (int) round(($xp4 / $xp4Target) * 100));
 $lessons4Done = count($summary4['completed']); $lessons4Total = max(1, $summary4['lessonsTotal']);
 $lesson4Percent = min(100, (int) round(($lessons4Done / $lessons4Total) * 100));
+
+$xp5 = $summary5['xp']; $xp5Target = 100;
+$xp5Percent = min(100, (int) round(($xp5 / $xp5Target) * 100));
+$lessons5Done = count($summary5['completed']); $lessons5Total = max(1, $summary5['lessonsTotal']);
+$lesson5Percent = min(100, (int) round(($lessons5Done / $lessons5Total) * 100));
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -197,6 +208,29 @@ $lesson4Percent = min(100, (int) round(($lessons4Done / $lessons4Total) * 100));
             <p style="color:var(--ink-soft); font-weight:700;">🏫 Ask your teacher to set your grade level to unlock Level 4 progress tracking.</p>
             <?php else: ?>
             <p style="color:var(--ink-soft); font-weight:700;">🔒 Finish every Level 3 lesson to unlock Level 4 progress tracking.</p>
+            <?php endif; ?>
+
+            <h2 class="section-title" style="margin-top:26px;">👂 Level 5: Listening &amp; Vocabulary<?= $pupilGrade ? ' (Grade ' . $pupilGrade . ')' : '' ?></h2>
+            <?php if ($level5Unlocked && $pupilGrade): ?>
+            <div class="stat-grid" style="grid-template-columns: repeat(2, 1fr);">
+                <div class="stat-card">
+                    <span class="stat-icon">⭐</span>
+                    <div class="stat-value"><?= $xp5 ?> XP</div>
+                    <div class="stat-label">Total Level 5 Experience</div>
+                    <div class="xp-bar-track"><div class="xp-bar-fill" data-width="<?= $xp5Percent ?>"></div></div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">📘</span>
+                    <div class="stat-value"><?= $lessons5Done ?> / <?= $summary5['lessonsTotal'] ?></div>
+                    <div class="stat-label">Activities Completed</div>
+                    <div class="xp-bar-track"><div class="xp-bar-fill" data-width="<?= $lesson5Percent ?>"></div></div>
+                </div>
+            </div>
+            <p style="color:var(--ink-soft); font-weight:700;">Your progress bars fill up as you complete each Level 5 listening &amp; vocabulary activity.</p>
+            <?php elseif ($level5Unlocked): ?>
+            <p style="color:var(--ink-soft); font-weight:700;">🏫 Ask your teacher to set your grade level to unlock Level 5 progress tracking.</p>
+            <?php else: ?>
+            <p style="color:var(--ink-soft); font-weight:700;">🔒 Finish every Level 4 passage to unlock Level 5 progress tracking.</p>
             <?php endif; ?>
         </main>
     </div>
