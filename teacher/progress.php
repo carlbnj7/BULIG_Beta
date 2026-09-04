@@ -8,6 +8,8 @@ require_once __DIR__ . '/../config/level2b_helpers.php';
 require_once __DIR__ . '/../config/level3_helpers.php';
 require_once __DIR__ . '/../config/level4_helpers.php';
 require_once __DIR__ . '/../config/level4_content.php';
+require_once __DIR__ . '/../config/level5_helpers.php';
+require_once __DIR__ . '/../config/level5_content.php';
 require_teacher_login();
 
 $activeTeacherNav = 'progress';
@@ -37,6 +39,12 @@ try {
             $roster[$i]['l4_summary'] = null;
             $roster[$i]['l4_content'] = null;
         }
+
+        // Level 5 — pupil-scored, so this is monitoring-only (no form).
+        $l5Eligible = bulig_level4_is_complete($pdo, $p['id'], $grade);
+        $roster[$i]['l5_eligible'] = $l5Eligible;
+        $roster[$i]['l5_grade']    = $grade;
+        $roster[$i]['l5_summary']  = ($l5Eligible && $grade) ? bulig_level5_summary($pdo, $p['id'], $grade) : null;
     }
 } catch (Throwable $e) {
     $dbError = true;
@@ -280,6 +288,56 @@ function bulig_render_answers(array $questions, object $answers): string
                 </div>
                 <p style="color:var(--ink-soft); font-weight:700; font-size:13px; margin-top:14px;">
                     Oral Reading Score = (words read correctly ÷ total words) × 100. 98-100% = Independent, 90-97% = Instructional, 89% and below = Frustration — same thresholds as the module's own Marking and Scoring Guide.
+                </p>
+                <?php endif; ?>
+            <?php endif; ?>
+
+            <h2 class="section-title" style="margin-top:34px;">👂 Level 5 Listening &amp; Vocabulary</h2>
+            <?php if ($dbError): ?>
+                <div class="coming-soon">
+                    <span class="cs-icon">⚠️</span>
+                    <h1>Couldn't load Level 5 data</h1>
+                    <p>There was a problem connecting to the database. Please check the connection settings and try again.</p>
+                </div>
+            <?php else:
+                $l5Pupils = array_filter($roster, fn($p) => $p['l5_eligible'] && $p['l5_grade']);
+            ?>
+                <?php if (empty($l5Pupils)): ?>
+                <div class="coming-soon">
+                    <span class="cs-icon">👂</span>
+                    <h1>No pupils ready for Level 5 yet</h1>
+                    <p>This appears once a pupil has finished Level 4 <em>and</em> has a Grade set on the My Pupils page. Level 5 is self-scored by the pupil, so there's nothing for you to record here — just track their progress.</p>
+                </div>
+                <?php else: ?>
+                <div class="data-card">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Pupil</th>
+                                <th>Grade</th>
+                                <th>Activities Completed</th>
+                                <th>XP</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <?php foreach ($l5Pupils as $p): $s5 = $p['l5_summary']; $total5 = max(1, $s5['lessonsTotal']); $pct5 = (int) round(count($s5['completed']) / $total5 * 100); ?>
+                            <tr>
+                                <td style="font-weight:800;color:var(--ink);"><?= htmlspecialchars($p['name'], ENT_QUOTES) ?><br><span style="font-weight:600;color:var(--ink-soft);font-size:11.5px;">ID <?= htmlspecialchars($p['student_id'], ENT_QUOTES) ?></span></td>
+                                <td><span class="chip chip-level">Grade <?= $p['l5_grade'] ?></span></td>
+                                <td>
+                                    <?= count($s5['completed']) ?>/<?= $s5['lessonsTotal'] ?>
+                                    <div class="mini-bar-track"><div class="mini-bar-fill" style="width:<?= $pct5 ?>%"></div></div>
+                                </td>
+                                <td><?= $s5['xp'] ?> XP</td>
+                                <td><?= count($s5['completed']) >= $s5['lessonsTotal'] && $s5['lessonsTotal'] > 0 ? '<span class="chip chip-champion">🏆 Champion</span>' : (count($s5['completed']) > 0 ? '<span class="chip chip-progress">In progress</span>' : '<span class="chip chip-neutral">Not started</span>') ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+                <p style="color:var(--ink-soft); font-weight:700; font-size:13px; margin-top:14px;">
+                    Level 5 content is still being added grade-by-grade — some pupils may see fewer than 20 activities marked "Content Coming Soon" until the rest is transcribed.
                 </p>
                 <?php endif; ?>
             <?php endif; ?>

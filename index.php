@@ -34,31 +34,21 @@ $errorMessage = $errors[$errorCode] ?? null;
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/manage.css">
 </head>
-<body>
+<body class="bg-login-split">
 
-<div class="scene">
+<div class="login-shell">
 
-    <div class="floaters" aria-hidden="true">
-        <span class="floater f-book">📖</span>
-        <span class="floater f-star">✦</span>
-        <span class="floater f-pencil">✎</span>
-        <span class="floater f-star2">✦</span>
-        <span class="deco d-cloud" style="top:8%; left:20%;">☁️</span>
-        <span class="deco d-letter" style="top:66%; left:6%;">Aa</span>
-        <span class="deco d-star" style="top:34%; right:6%;">✦</span>
-        <span class="deco d-cloud" style="bottom:10%; right:22%; animation-delay:1.6s;">☁️</span>
-    </div>
-
-    <main class="auth-card" id="authCard">
-
-        <div class="brand">
+    <div class="login-illustration" aria-hidden="true">
+        <div class="brand-showcase">
             <img src="assets/bulig-logo.png" alt="BULIG - Bukidnon's Unified Literacy and Intervention Gateway" class="brand-logo">
+            <p class="brand-subline">Building Up Literacy, Inspiring Growth</p>
             <p class="brand-tagline">Division of Bukidnon &middot; Reading Intervention Gateway</p>
         </div>
+    </div>
 
-        <div class="torch-divider" aria-hidden="true">
-            <span class="torch-flame"></span>
-        </div>
+    <div class="login-panel">
+
+    <main class="auth-card" id="authCard">
 
         <div class="tabs" role="tablist" aria-label="Choose account type">
             <button type="button" class="tab <?= $activeType === 'pupil' ? 'is-active' : '' ?>"
@@ -147,6 +137,8 @@ $errorMessage = $errors[$errorCode] ?? null;
         </div>
 
     </main>
+
+    </div>
 
 </div>
 

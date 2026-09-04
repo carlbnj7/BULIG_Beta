@@ -7,6 +7,7 @@ require_once __DIR__ . '/../config/level2_helpers.php';
 require_once __DIR__ . '/../config/level2b_helpers.php';
 require_once __DIR__ . '/../config/level3_helpers.php';
 require_once __DIR__ . '/../config/level4_helpers.php';
+require_once __DIR__ . '/../config/level5_helpers.php';
 require_once __DIR__ . '/../config/avatar_helpers.php';
 require_pupil_login();
 
@@ -30,6 +31,8 @@ try {
     $pupilGrade     = bulig_pupil_grade($pdo, $pupilId);
     $assignedLevel  = bulig_pupil_current_level($pdo, $pupilId);
     $summary4       = $pupilGrade ? bulig_level4_summary($pdo, $pupilId, $pupilGrade) : ['xp' => 0, 'completed' => [], 'lessonsTotal' => 0, 'postDone' => false];
+    $level4Complete = bulig_level4_is_complete($pdo, $pupilId, $pupilGrade);
+    $summary5       = $pupilGrade ? bulig_level5_summary($pdo, $pupilId, $pupilGrade) : ['xp' => 0, 'completed' => [], 'lessonsTotal' => 0];
     $recentActivity = bulig_pupil_recent_activity($pdo, $pupilId, 5);
 } catch (Throwable $e) {
     $summary        = ['xp' => 0, 'completed' => [], 'streakDays' => 0];
@@ -43,18 +46,21 @@ try {
     $pupilGrade     = null;
     $assignedLevel  = 1;
     $summary4       = ['xp' => 0, 'completed' => [], 'lessonsTotal' => 0, 'postDone' => false];
+    $level4Complete = false;
+    $summary5       = ['xp' => 0, 'completed' => [], 'lessonsTotal' => 0];
     $recentActivity = [];
 }
 $level2Unlocked  = bulig_level_unlocked(2, $level1Complete, $assignedLevel);
 $level2bUnlocked = bulig_level_unlocked(3, $level2Complete, $assignedLevel);
 $level3Unlocked  = bulig_level_unlocked(4, $level2bComplete, $assignedLevel);
 $level4Unlocked  = bulig_level_unlocked(5, $level3Complete, $assignedLevel);
+$level5Unlocked  = bulig_level_unlocked(6, $level4Complete, $assignedLevel);
 
 $initial = strtoupper(substr((string) $_SESSION['full_name'], 0, 1)) ?: 'R';
 $xp          = $summary['xp'];
 $xpTarget    = 100;
 $xpPercent   = min(100, (int) round(($xp / $xpTarget) * 100));
-$badgesCount = count($summary['completed']) + count($summary2['completed']) + count($summary2b['completed']) + count($summary3['completed']) + count($summary4['completed']); // one badge per completed quest, all levels
+$badgesCount = count($summary['completed']) + count($summary2['completed']) + count($summary2b['completed']) + count($summary3['completed']) + count($summary4['completed']) + count($summary5['completed']); // one badge per completed quest, all levels
 $streakDays  = $summary['streakDays'];
 
 $level2Done  = count($summary2['completed']);
@@ -68,6 +74,9 @@ $level3Total = $summary3['lessonsTotal'];
 
 $level4Done  = count($summary4['completed']);
 $level4Total = $summary4['lessonsTotal'];
+
+$level5Done  = count($summary5['completed']);
+$level5Total = $summary5['lessonsTotal'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -203,6 +212,28 @@ $level4Total = $summary4['lessonsTotal'];
                     <span class="action-icon">🔒</span>
                     <h3>Level 4: Fluency</h3>
                     <p>Unlocks after you complete Level 3.</p>
+                    <span class="pill-soon">Locked</span>
+                </div>
+                <?php endif; ?>
+                <?php if ($level5Unlocked && $pupilGrade): ?>
+                <a href="level5.php" class="action-card acc-pupil">
+                    <span class="action-icon">👂</span>
+                    <h3>Level 5: Listening &amp; Vocabulary (Grade <?= $pupilGrade ?>)</h3>
+                    <p><?= $level5Total ?> activities made just for Grade <?= $pupilGrade ?> — listening comprehension and vocabulary building!</p>
+                    <span class="action-go" style="color:var(--bulig-green-dark);"><?= $level5Done === 0 ? 'Start Quest →' : ($level5Done === $level5Total ? 'Review →' : 'Continue →') ?></span>
+                </a>
+                <?php elseif ($level5Unlocked && !$pupilGrade): ?>
+                <div class="action-card is-soon">
+                    <span class="action-icon">🏫</span>
+                    <h3>Level 5: Listening &amp; Vocabulary</h3>
+                    <p>Ask your teacher to set your grade level to unlock this.</p>
+                    <span class="pill-soon">Needs Grade</span>
+                </div>
+                <?php else: ?>
+                <div class="action-card is-soon">
+                    <span class="action-icon">🔒</span>
+                    <h3>Level 5: Listening &amp; Vocabulary</h3>
+                    <p>Unlocks after you complete Level 4.</p>
                     <span class="pill-soon">Locked</span>
                 </div>
                 <?php endif; ?>

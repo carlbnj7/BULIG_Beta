@@ -165,3 +165,20 @@ function bulig_l4_compute_score(int $wordCount, array $miscues, int $timeSeconds
         'wpm'              => $wpm,
     ];
 }
+
+/**
+ * Level 5 is locked until every one of the pupil's grade's Level 4
+ * intervention passages is practiced. Grade-gated the same way Level 4
+ * itself is gated behind Level 3 — added here (not level5_helpers.php)
+ * to match how level3_helpers.php holds its own bulig_level3_is_complete.
+ * A pupil with no grade assigned yet can't be "complete" (nothing to
+ * measure against), so this returns false rather than erroring.
+ */
+function bulig_level4_is_complete(PDO $pdo, int $pupilId, ?int $grade): bool
+{
+    if ($grade === null) {
+        return false;
+    }
+    $l4 = bulig_level4_summary($pdo, $pupilId, $grade);
+    return count($l4['completed']) >= $l4['lessonsTotal'] && $l4['lessonsTotal'] > 0;
+}

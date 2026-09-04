@@ -161,6 +161,30 @@ for ($i = 1; $i <= $summary4['lessonsTotal']; $i++) {
     $badges4[] = ['icon' => $passageEmojis[($i - 1) % count($passageEmojis)], 'name' => 'Passage ' . $i, 'earned' => isset($earnedSet4[$i])];
 }
 $badges4[] = ['icon' => '🎙️', 'name' => 'Level 4 Champ', 'earned' => $summary4['postDone']];
+
+// Level 5 badges — one per grade-specific listening/vocabulary activity,
+// using the REAL activity titles from config/level5_content.php (never
+// invented names), plus a champ badge once all are done.
+require_once __DIR__ . '/../config/level5_helpers.php';
+require_once __DIR__ . '/../config/level5_content.php';
+try {
+    $level4Complete = bulig_level4_is_complete($pdo, (int) $_SESSION['pupil_id'], $pupilGrade);
+    $summary5       = $pupilGrade ? bulig_level5_summary($pdo, (int) $_SESSION['pupil_id'], $pupilGrade) : ['completed' => [], 'lessonsTotal' => 0];
+} catch (Throwable $e) {
+    $level4Complete = false;
+    $summary5       = ['completed' => [], 'lessonsTotal' => 0];
+}
+$earnedSet5 = array_flip($summary5['completed']);
+$level5Unlocked = bulig_level_unlocked(6, $level4Complete, $assignedLevel);
+$titles5 = $pupilGrade ? (bulig_level5_activity_titles()[$pupilGrade] ?? []) : [];
+$badges5 = [];
+foreach ($titles5 as $i => $title) {
+    $num = $i + 1;
+    $badges5[] = ['icon' => '👂', 'name' => $title, 'earned' => isset($earnedSet5[$num])];
+}
+if (!empty($titles5)) {
+    $badges5[] = ['icon' => '🏆', 'name' => 'Level 5 Champ', 'earned' => count($summary5['completed']) === count($titles5)];
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -247,6 +271,23 @@ $badges4[] = ['icon' => '🎙️', 'name' => 'Level 4 Champ', 'earned' => $summa
             <p style="color:var(--ink-soft); font-weight:700; margin-top:-6px;">🏫 Ask your teacher to set your grade level to unlock Level 4 badges.</p>
             <?php else: ?>
             <p style="color:var(--ink-soft); font-weight:700; margin-top:-6px;">🔒 Finish every Level 3 lesson to unlock Level 4 badges.</p>
+            <?php endif; ?>
+
+            <h2 class="section-title" style="margin-top:26px;">👂 Level 5 Badges<?= $pupilGrade ? ' (Grade ' . $pupilGrade . ')' : '' ?></h2>
+            <?php if ($level5Unlocked && $pupilGrade): ?>
+            <p style="color:var(--ink-soft); font-weight:700; margin-top:-6px;">Complete each Grade <?= $pupilGrade ?> activity to unlock these badges.</p>
+            <div class="badge-grid" style="margin-top:16px;">
+                <?php foreach ($badges5 as $b): ?>
+                <div class="badge-slot<?= $b['earned'] ? ' is-earned' : '' ?>">
+                    <span class="badge-icon"><?= $b['icon'] ?></span>
+                    <div class="badge-name"><?= htmlspecialchars($b['name'], ENT_QUOTES) ?></div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+            <?php elseif ($level5Unlocked): ?>
+            <p style="color:var(--ink-soft); font-weight:700; margin-top:-6px;">🏫 Ask your teacher to set your grade level to unlock Level 5 badges.</p>
+            <?php else: ?>
+            <p style="color:var(--ink-soft); font-weight:700; margin-top:-6px;">🔒 Finish every Level 4 passage to unlock Level 5 badges.</p>
             <?php endif; ?>
         </main>
     </div>
